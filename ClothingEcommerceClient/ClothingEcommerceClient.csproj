@@ -7,12 +7,23 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\lib\fontawesome-iconpicker\**" />
+    <Content Remove="wwwroot\lib\fontawesome-iconpicker\**" />
+    <EmbeddedResource Remove="wwwroot\lib\fontawesome-iconpicker\**" />
+    <None Remove="wwwroot\lib\fontawesome-iconpicker\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.3" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ClothingEcommerceSharedLibrary\ClothingEcommerceSharedLibrary.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\lib\" />
   </ItemGroup>
 
 </Project>
