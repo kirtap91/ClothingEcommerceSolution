@@ -16,6 +16,8 @@ namespace ClothingEcommerceClient.Services
             AllowTrailingCommas = true,
             PropertyNameCaseInsensitive = true,
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            WriteIndented = true,
+            ReferenceHandler = ReferenceHandler.Preserve,
             UnmappedMemberHandling = JsonUnmappedMemberHandling.Skip
         };
 
@@ -26,7 +28,7 @@ namespace ClothingEcommerceClient.Services
             JsonSerializer.Deserialize<T>(jsonString, _jsonOptions) ?? throw new JsonException("Deserialization failed.");
 
         private StringContent GenerateStringContent(string serializedObj) =>
-            new StringContent(serializedObj, Encoding.UTF8, "application/json");
+            new(serializedObj, Encoding.UTF8, "application/json");
 
         public async Task<ServiceResponse> AddProduct(Product model)
         {
@@ -50,6 +52,67 @@ namespace ClothingEcommerceClient.Services
 
             var result = await response.Content.ReadAsStringAsync();
             return DeserializeJsonString<List<Product>>(result);
+        }
+
+        public async Task<ServiceResponse> AddProductVariant(int productId, ProductVariant variant)
+        {
+            var response = await httpClient.PostAsync($"{BaseUrl}/{productId}/variants", GenerateStringContent(SerializeObj(variant)));
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new HttpRequestException("Error adding product variant.");
+            }
+
+            var apiResponse = await response.Content.ReadAsStringAsync();
+            return DeserializeJsonString<ServiceResponse>(apiResponse);
+        }
+
+        public async Task<ServiceResponse> UpdateProductVariant(int productId, ProductVariant variant)
+        {
+            var response = await httpClient.PutAsync($"{BaseUrl}/{productId}/variants/{variant.Id}", GenerateStringContent(SerializeObj(variant)));
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new HttpRequestException("Error updating product variant.");
+            }
+
+            var apiResponse = await response.Content.ReadAsStringAsync();
+            return DeserializeJsonString<ServiceResponse>(apiResponse);
+        }
+
+        public async Task<Product> GetProductById(int productId)
+        {
+            var response = await httpClient.GetAsync($"{BaseUrl}/{productId}");
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new HttpRequestException("Error retrieving product details.");
+            }
+
+            var result = await response.Content.ReadAsStringAsync();
+            return DeserializeJsonString<Product>(result);
+        }
+
+        public async Task<List<ProductVariant>> GetProductVariantsByProductId(int productId)
+        {
+            var response = await httpClient.GetAsync($"{BaseUrl}/{productId}/variants");
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new HttpRequestException("Error retrieving product variants.");
+            }
+
+            var result = await response.Content.ReadAsStringAsync();
+            return DeserializeJsonString<List<ProductVariant>>(result);
+        }
+
+
+        public async Task<ServiceResponse> RemoveProductVariant(int productId, int variantId)
+        {
+            var response = await httpClient.DeleteAsync($"{BaseUrl}/{productId}/variants/{variantId}");
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new HttpRequestException("Error removing product variant.");
+            }
+
+            var apiResponse = await response.Content.ReadAsStringAsync();
+            return DeserializeJsonString<ServiceResponse>(apiResponse);
         }
     }
     //private static string SerializeObj(object modelObject) =>

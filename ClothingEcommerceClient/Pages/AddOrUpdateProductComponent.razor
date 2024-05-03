@@ -1,45 +1,82 @@
 ﻿@page "/add-product"
+@using ClothingEcommerceSharedLibrary.Enums
 
 <div class="container">
     <div class="row">
-        <div class="col-md-6">
-            <EditForm Model="MyProduct" Enhance OnInvalidSubmit="HandleSaveProduct">
-                <DataAnnotationsValidator/>
-                <ValidationSummary/>
+        <div class="col-md-12">
+            <EditForm Model="MyProduct" OnValidSubmit="HandleSaveProduct">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
                 <div class="card">
                     <div class="card-header">Add Product</div>
-                    <div class="card-body"</div>
+                    <div class="card-body">
                         <div class="form-group">
-                            <label for="productName" class="form-label"> Name</label>
-                            <InputText @bind-Value="MyProduct.Name" class="form-control"></InputText>
+                            <label for="productName">Name</label>
+                            <InputText @bind-Value="MyProduct.Name" class="form-control" />
                         </div>
-                    <div class="form-group mt-3">
-                        <label for="productPrice" class="form-label"> Price</label>
-                        <InputNumber @bind-Value="MyProduct.Price" class="form-control"></InputNumber>
-                    </div>
-                    <div class="form-group mt-3">
-                        <label for="productQuantity" class="form-label"> Quantity</label>
-                        <InputNumber @bind-Value="MyProduct.Quantity" class="form-control"></InputNumber>
-                    </div>
-                    <div class="form-group mt-3">
-                        <label for="productDescription" class="form-label"> Description</label>
-                        <InputTextArea @bind-Value="MyProduct.Description" class="form-control"></InputTextArea>
-                    </div>
+                        <div class="form-group">
+                            <label for="productDescription">Description</label>
+                            <InputTextArea @bind-Value="MyProduct.Description" class="form-control" />
+                        </div>
+                        <div class="form-group">
+                            <label for="productBrand">Brand</label>
+                            <InputText @bind-Value="MyProduct.Brand" class="form-control" />
+                        </div>
+                        <div class="form-group">
+                            <label for="productCategory">Category</label>
+                            <InputSelect @bind-Value="MyProduct.Category" class="form-control">
+                                @foreach (var category in Enum.GetValues<Category>())
+                                {
+                                    <option value="@category">@category</option>
+                                }
+                            </InputSelect>
+                        </div>
+                        <div class="form-group">
+                            <label for="productPrice">Price</label>
+                            <InputNumber @bind-Value="MyProduct.Price" class="form-control" />
+                        </div>
 
-                    <div class="form-group mt-3">
-                        <label for="productImage" class="form-label @(ImageUploadMessage == ""?"":"text-danger")">
-                            @(ImageUploadMessage == "" ? "Upload Image" : ImageUploadMessage)
-                        </label>
-                        <InputFile class="form-control" OnChange="UploadImage"></InputFile>
-                    </div>
-                </div>
-                <div class="card-footer">
-                    <div class="form-group mt-3">
-                        @if (ShowSaveButton)
+                        <h5>Add Variants</h5>
+                        <div class="form-group">
+                            <label for="variantColor">Color</label>
+                            <InputSelect @bind-Value="tempVariant.Color" class="form-control">
+                                @foreach (var color in AvailableColors)
+                                {
+                                    <option value="@color">@color</option>
+                                }
+                            </InputSelect>
+                        </div>
+                        <div class="form-group">
+                            <label for="variantSize">Size</label>
+                            <InputSelect @bind-Value="tempVariant.Size" class="form-control">
+                                @foreach (var size in Sizes)
+                                {
+                                    <option value="@size">@size</option>
+                                }
+                            </InputSelect>
+                        </div>
+                        <div class="form-group">
+                            <label for="variantQuantity">Quantity</label>
+                            <InputNumber @bind-Value="tempVariant.Quantity" class="form-control" />
+                        </div>
+                        <div class="form-group">
+                            <label for="variantImage">Upload Image</label>
+                            <InputFile OnChange="@(e => HandleVariantImageUpload(e, tempVariant))" multiple class="form-control" />
+                        </div>
+                        <button @onclick="AddVariant" class="btn btn-primary">Add Product</button>
+                        @foreach (var variant in SelectedVariants)
                         {
-                            <button type="submit" class="btn btn-outline-primary"> <i class="fa fa-plus"></i>Save Product</button>
+                            <p>@variant.Color @variant.Size @variant.Quantity</p>
+                            @if (variant.Images.Any())
+                            {
+                                <img src="@variant.Images.First().ImageData" alt="Variant Image" />
+                            }   
                         }
-                        <BusyButtonComponent ShowBusyButton="ShowBusyButton"></BusyButtonComponent>
+
+                    </div>
+                    <div class="card-footer">
+                        <button type="submit" class="btn btn-success">Save Product</button>
                     </div>
                 </div>
             </EditForm>
@@ -50,71 +87,160 @@
 
 @code {
     Product MyProduct = new();
+    ProductVariant Variant = new();
     string ImageUploadMessage = "";
     public bool ShowBusyButton { get; set; }
     public bool ShowSaveButton { get; set; } = true;
+    List<string> AvailableColors = new List<string> { "White", "Black", "Beige" };
+    List<string> Sizes = new List<string> { "XS", "S", "M", "L", "XL" };
+    List<ProductVariant> SelectedVariants = new List<ProductVariant>();
+    ProductVariant tempVariant = new();
+
+    List<ProductImage> imageList = new List<ProductImage>();
+
     MessageDialog? messageDialog;
+
+    void AddVariant()
+    {
+        // Clone the tempVariant to add to the list, to avoid reference issues.
+        var cloneVariant = new ProductVariant
+            {
+                Color = tempVariant.Color,
+                Size = tempVariant.Size,
+                Quantity = tempVariant.Quantity,
+                Images = new List<ProductImage>(tempVariant.Images) // Ensure this copies correctly.
+            };
+
+        SelectedVariants.Add(cloneVariant);
+
+        // Reset tempVariant to be ready for new inputs.
+        tempVariant = new ProductVariant();
+        tempVariant.Images = new List<ProductImage>(); // Resetting images list for the next entry.
+    }
+
+
+    async Task HandleVariantImageUpload(InputFileChangeEventArgs e, ProductVariant variant)
+    {
+        var imageFiles = e.GetMultipleFiles();
+        var format = "image/png"; // Assuming PNG format; adjust as necessary
+
+        foreach (var file in imageFiles)
+        {
+            var resizedImage = await file.RequestImageFileAsync(format, 300, 300);
+            using var stream = resizedImage.OpenReadStream();
+            byte[] buffer = new byte[resizedImage.Size];
+            await stream.ReadAsync(buffer);
+            string imageData = $"data:{format};base64,{Convert.ToBase64String(buffer)}";
+
+            if (variant.Images == null)
+                variant.Images = new List<ProductImage>();
+
+            variant.Images.Add(new ProductImage { ImageData = imageData });
+        }
+    }
     async Task HandleSaveProduct()
     {
         ShowSaveButton = false;
-        ShowBusyButton = !ShowSaveButton;
-        if (string.IsNullOrEmpty(MyProduct.Base64Img))
+        ShowBusyButton = true;
+
+        // Assuming you have a way to attach images to the product model
+        MyProduct.Images = imageList;
+
+        // Attach each variant to the product
+        foreach (var variant in SelectedVariants)
         {
-            messageDialog!.SetDialogValues("Warning", "You need to choose image");
-            SetMessageDialog();
-            return;
+            variant.Product = MyProduct; // Link variant to the product
+            MyProduct.Variants.Add(variant); // Add the variant to the product's variants collection
+
+            // Ensure each image in variant is linked
+            foreach (var image in variant.Images)
+            {
+                image.ProductVariant = variant; // Link the image to the variant
+                image.Product = null; // Ensure it's not directly linked to the product unless necessary
+            }
         }
-        ResetFormState();
+
+        try
+        {
+            var (flag, message) = await ClientService.AddProduct(MyProduct);
+            if (flag)
+            {
+                messageDialog!.SetDialogValues("Success", message);
+            }
+            else
+            {
+                messageDialog!.SetDialogValues("Error", message);
+            }
+
+            ResetFormState();
+        }
+        finally
+        {
+            ShowSaveButton = true;
+            ShowBusyButton = false;
+            StateHasChanged();
+        }
     }
 
-    // async Task UploadImage(InputFileChangeEventArgs e)
-    // {
-    //     if (e.File.Name.ToLower().Contains(".png"))
-    //     {
-    //         var format = "image/png";
-    //         var resizeImage = await e.File.RequestImageFileAsync(format, 300, 300);
-    //         var buffer = new byte[resizeImage.Size];
-    //         await resizeImage.OpenReadStream().ReadAsync(buffer);
-    //         var imageData = $"data:{format}; base64, {Convert.ToBase64String(buffer)}";
-    //         ImageUploadMessage = "";
-    //         MyProduct.Base64Img = imageData;
-    //         imageData = "";
-    //         return;
-    //     }
-    //     ImageUploadMessage = "PNG file needed";
-    //     return;
-    // }
 
-    async Task UploadImage(InputFileChangeEventArgs e)
+
+    async Task UploadImages(InputFileChangeEventArgs e)
     {
-        if (!e.File.Name.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
-        {
-            ImageUploadMessage = "PNG file needed";
-            return;
-        }
-
-        await ProcessImageFile(e.File);
-    }
-
-    private async Task ProcessImageFile(IBrowserFile file)
-    {
-        var format = "image/png";
-        var resizeImage = await file.RequestImageFileAsync(format, 300, 300);
-
-        using (var stream = resizeImage.OpenReadStream())
-        {
-            var buffer = new byte[resizeImage.Size];
-            await stream.ReadAsync(buffer);
-            var imageData = $"data:{format};base64,{Convert.ToBase64String(buffer)}";
-            MyProduct.Base64Img = imageData;
-        }
-
+        var validImages = new List<ProductImage>();
         ImageUploadMessage = "";
+
+        foreach (var file in e.GetMultipleFiles())
+        {
+            var imageData = await ProcessImageAsync(file);
+            if (imageData != null)
+            {
+                validImages.Add(new ProductImage { ImageData = imageData });
+            }
+            else
+            {
+                ImageUploadMessage += $"Invalid file format or error processing: {file.Name}. Only PNG files are supported. ";
+            }
+        }
+
+        if (validImages.Count > 0)
+        {
+            imageList.AddRange(validImages);
+            ImageUploadMessage = "Images uploaded successfully.";
+        }
+        else if (string.IsNullOrEmpty(ImageUploadMessage))
+        {
+            ImageUploadMessage = "No valid images uploaded.";
+        }
+    }
+
+
+    private async Task<string?> ProcessImageAsync(IBrowserFile file)
+    {
+        const string ImageFormat = "image/png";
+        if (!file.ContentType.Equals(ImageFormat, StringComparison.OrdinalIgnoreCase))
+        {
+            return null; // Return null if the file format is not PNG
+        }
+
+        try
+        {
+            var resizedImage = await file.RequestImageFileAsync(ImageFormat, 300, 300);
+            using var stream = resizedImage.OpenReadStream();
+            var buffer = new byte[resizedImage.Size];
+            await stream.ReadAsync(buffer);
+            return $"data:{ImageFormat};base64,{Convert.ToBase64String(buffer)}";
+        }
+        catch
+        {
+            return null; // Return null if an error occurs during image processing
+        }
     }
 
     void ResetFormState()
     {
         MyProduct = new Product();
+        Variant = new ProductVariant();
+        StateHasChanged();
     }
 
     private async void SetMessageDialog()
