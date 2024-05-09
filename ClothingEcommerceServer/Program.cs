@@ -1,6 +1,5 @@
 using ClothingEcommerceServer.Data;
 using ClothingEcommerceServer.Repositories;
-using ClothingEcommerceSharedLibrary.Contracts;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,6 +17,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Default") ?? throw new InvalidOperationException("Connection String not found"));
 });
 builder.Services.AddScoped<IProduct, ProductRepository>();
+builder.Services.AddScoped<ICategory, CategoryRepository>();
 
 var app = builder.Build();
 

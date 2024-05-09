@@ -17,4 +17,8 @@
     <ProjectReference Include="..\ClothingEcommerceSharedLibrary\ClothingEcommerceSharedLibrary.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Pages\CategoryPages\" />
+  </ItemGroup>
+
 </Project>

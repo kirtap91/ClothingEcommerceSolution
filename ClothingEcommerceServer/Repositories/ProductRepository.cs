@@ -1,19 +1,14 @@
 ﻿using ClothingEcommerceServer.Data;
-using ClothingEcommerceSharedLibrary.Contracts;
 using ClothingEcommerceSharedLibrary.Models;
 using ClothingEcommerceSharedLibrary.Responses;
 using Microsoft.EntityFrameworkCore;
 
 namespace ClothingEcommerceServer.Repositories
 {
-    public class ProductRepository : IProduct
+    public class ProductRepository(AppDbContext appDbContext) : IProduct
     {
-        private readonly AppDbContext appDbContext;
+        private readonly AppDbContext appDbContext = appDbContext;
 
-        public ProductRepository(AppDbContext appDbContext)
-        {
-            this.appDbContext = appDbContext;
-        }
         public async Task<ServiceResponse> AddProduct(Product model)
         {
             if (model == null) return new ServiceResponse(false, "Model is null");

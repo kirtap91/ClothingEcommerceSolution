@@ -1,4 +1,4 @@
-﻿using ClothingEcommerceSharedLibrary.Contracts;
+﻿using ClothingEcommerceServer.Repositories;
 using ClothingEcommerceSharedLibrary.Models;
 using ClothingEcommerceSharedLibrary.Responses;
 using Microsoft.AspNetCore.Mvc;

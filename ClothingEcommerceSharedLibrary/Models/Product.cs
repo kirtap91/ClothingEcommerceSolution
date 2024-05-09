@@ -18,5 +18,8 @@ namespace ClothingEcommerceSharedLibrary.Models
         public int Quantity { get; set; }
         public bool Featured { get; set; } = false;
         public DateTime DateUploaded { get; set; } = DateTime.Now;
+
+        public Category? Category { get; set; }
+        public int CategoryId { get; set; }
     }
 }
