@@ -74,14 +74,9 @@
     private async Task RetrieveProducts()
     {
         ProductList?.Clear();
-        bool featured = true;
-        var results = await ClientService.GetAllProducts(featured);
-        if (results is null) return;
-
-        foreach (var i in results)
-        {
-            ProductList!.Add(i);
-        }
+        bool featured = false;
+        await ProductService.GetAllProducts(featured);
+        var data = ClientService.FeaturedProducts;
         LoadData();
     }
 

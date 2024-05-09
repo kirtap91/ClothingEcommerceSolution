@@ -10,12 +10,12 @@
 @using ClothingEcommerceClient
 @using ClothingEcommerceClient.Layout
 @using ClothingEcommerceSharedLibrary.Models
-@using ClothingEcommerceClient.Pages
+
 @using Syncfusion.Blazor.Navigations
-@using Syncfusion.Blazor
 @using ClothingEcommerceClient.Pages.OtherPages
 @using ClothingEcommerceClient.Pages.ProductPages
 
 @inject IJSRuntime js
-@inject IProductService ClientService
-
+@inject IProductService ProductService
+@inject ICategoryService CategoryService
+@inject MessageDialogService MessageDialogService

@@ -12,6 +12,7 @@ namespace ClothingEcommerceClient.Services
         public List<Category> AllCategories { get; set; }
         public Action? ProductAction { get; set; }
         public List<Product> AllProducts { get; set; }
+        public List<Product> FeaturedProducts { get; set; }
 
         public async Task<ServiceResponse> AddProduct(Product model)
         {
@@ -25,23 +26,39 @@ namespace ClothingEcommerceClient.Services
             }
 
             var apiResponse = await ReadContent(response);
+            await ClearAndGetAllProducts();
             {
                 return JsonUtils.DeserializeJsonString<ServiceResponse>(apiResponse);
             }
         }
 
-
+        private async Task ClearAndGetAllProducts()
+        {
+            bool featuredProduct = true;
+            bool allProduct = false;
+            AllProducts = null!;
+            FeaturedProducts = null!;
+            await GetAllProducts(featuredProduct);
+            await GetAllProducts(allProduct);
+        }
         public async Task GetAllProducts(bool featuredProducts)
         {
-            if(featuredProducts && AllProducts is null)
+            if(featuredProducts && FeaturedProducts is null)
             {
-                AllProducts = await GetProducts(featuredProducts);
+                FeaturedProducts = await GetProducts(featuredProducts);
+                ProductAction?.Invoke();
                 return;
             }
-            if(!featuredProducts)
+            else
             {
-                
+                if (!featuredProducts && AllProducts is null)
+                {
+                    AllProducts = await GetProducts(featuredProducts);
+                    ProductAction?.Invoke();
+                    return;
+                }
             }
+
         }
         private async Task<List<Product>> GetProducts(bool featured)
         {
@@ -67,6 +84,7 @@ namespace ClothingEcommerceClient.Services
             }
 
             var apiResponse = await ReadContent(response);
+            await ClearAndGetAllCategories();
             {
                 return JsonUtils.DeserializeJsonString<ServiceResponse>(apiResponse);
             }
@@ -87,6 +105,11 @@ namespace ClothingEcommerceClient.Services
                 AllCategories = (List<Category>?)JsonUtils.DeserializeJsonStringList<Category>(result)!;
                 CategoryAction?.Invoke();
             }
+        }
+        private async Task ClearAndGetAllCategories()
+        {
+            AllCategories = null!;
+            await GetAllCategories();
         }
 
         private static ServiceResponse CheckResponse(HttpResponseMessage response)
