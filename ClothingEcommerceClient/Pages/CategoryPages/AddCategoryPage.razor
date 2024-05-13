@@ -1,4 +1,7 @@
-﻿<div class="container">
+﻿@page "/add-category"
+@implements IDisposable
+
+<div class="container">
     <div class="row">
         <div class="col-md-6">
             <EditForm Model="CategoryModel" Enhance OnValidSubmit="HandleSaveCategory">
@@ -14,14 +17,14 @@
                     </div>
                     <div class="card-footer">
                         <div class="form-group mt-3">
-                            @if (MessageDialogService.ShowSaveButton)
+                            @if (messageDialogService.ShowSaveButton)
                             {
                                 <button type="submit" class="btn btn-outline-primary">
                                     <i class="fa fa-plus"></i>
                                     Save Category
                                 </button>
                             }
-                            <BusyButtonComponent ShowBusyButton="MessageDialogService.ShowBusyButton"></BusyButtonComponent>
+                            <BusyButtonComponent ShowBusyButton="messageDialogService.ShowBusyButton"></BusyButtonComponent>
                         </div>
                     </div>
                 </div>
@@ -29,25 +32,33 @@
         </div>
     </div>
 </div>
-
+<MessageDialog @ref="messageDialogService.messageDialog"></MessageDialog>
 @code {
     Category CategoryModel = new();
+    protected override void OnInitialized()
+    {
+        messageDialogService.Action += StateHasChanged;
+    }
     async Task HandleSaveCategory()
     {
-        MessageDialogService.ShowSaveButton = false;
-        MessageDialogService.ShowBusyButton = !MessageDialogService.ShowSaveButton;
+        messageDialogService.ShowSaveButton = false;
+        messageDialogService.ShowBusyButton = !messageDialogService.ShowSaveButton;
         var (isSuccessful, message) = await CategoryService.AddCategory(CategoryModel);
         if (isSuccessful)
         {
-            MessageDialogService.messageDialog!.SetDialogValues("success", message);
+            messageDialogService.messageDialog!.SetDialogValues("success", message);
         }
         else
         {
-            MessageDialogService.messageDialog!.SetDialogValues("danger", message);
+            messageDialogService.messageDialog!.SetDialogValues("danger", message);
         }
 
-        MessageDialogService.SetMessageDialog();
+        messageDialogService.SetMessageDialog();
         return;
-        }
+    }
+
+    public void Dispose()
+    {
+        messageDialogService.Action -= StateHasChanged;
     }
 }
