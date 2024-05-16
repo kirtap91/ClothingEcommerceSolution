@@ -1,12 +1,14 @@
-﻿using ClothingEcommerceSharedLibrary.Models;
+﻿using ClothingEcommerceSharedLibrary.DTOs;
+using ClothingEcommerceSharedLibrary.Models;
 using ClothingEcommerceSharedLibrary.Responses;
 
 namespace ClothingEcommerceClient.Services
 {
-    public class ClientServices(HttpClient httpClient) : IProductService, ICategoryService
+    public class ClientServices(HttpClient httpClient) : IProductService, ICategoryService, IUserAccountService
     {
         private const string ProductBaseUrl = "api/product";
         private const string CategoryBaseUrl = "api/category";
+        private const string AuthenticationBaseUrl = "api/account";
 
         public Action? CategoryAction { get; set; }
         public List<Category> AllCategories { get; set; }
@@ -158,6 +160,28 @@ namespace ClothingEcommerceClient.Services
         }
         private static async Task<string> ReadContent(HttpResponseMessage response) => await response.Content.ReadAsStringAsync();
 
-        
+        //Account/authentication
+        public async Task<ServiceResponse> Register(UserDTO model)
+        {
+            var response = await httpClient.PostAsync($"{AuthenticationBaseUrl}/register",
+                JsonUtils.GenerateStringContent(JsonUtils.SerializeObj(model)));
+            var result = CheckResponse(response);
+            if (!result.IsSuccessful)
+                return result;
+
+            var apiResponse = await ReadContent(response);
+            return JsonUtils.DeserializeJsonString<ServiceResponse>(apiResponse);
+        }
+
+        public async Task<LoginResponse> Login(LoginDTO model)
+        {
+            var response = await httpClient.PostAsync($"{AuthenticationBaseUrl}/login",
+                JsonUtils.GenerateStringContent(JsonUtils.SerializeObj(model)));
+            if (!response.IsSuccessStatusCode)
+                return new LoginResponse(false, "Error occured", null!, null!);
+
+            var apiResponse = await ReadContent(response);
+            return JsonUtils.DeserializeJsonString<LoginResponse>(apiResponse);
+        }
     }
 }
