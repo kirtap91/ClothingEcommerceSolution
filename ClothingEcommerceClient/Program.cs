@@ -1,6 +1,7 @@
 using ClothingEcommerceClient;
 using ClothingEcommerceClient.Authentication;
 using ClothingEcommerceClient.Services;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Syncfusion.Blazor;
@@ -16,5 +17,6 @@ builder.Services.AddScoped<IUserAccountService, ClientServices>();
 
 builder.Services.AddScoped <AuthenticationService>();
 builder.Services.AddScoped<MessageDialogService>();
+builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 builder.Services.AddSyncfusionBlazor();
 await builder.Build().RunAsync();

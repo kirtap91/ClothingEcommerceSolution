@@ -4,13 +4,14 @@ using ClothingEcommerceSharedLibrary.DTOs;
 using ClothingEcommerceSharedLibrary.Responses;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Net.Http.Headers;
+using System.Security.Claims;
 using System.Text;
 
 namespace ClothingEcommerceClient.Authentication
 {
     public class AuthenticationService(ILocalStorageService localStorageService, HttpClient httpClient)
     {
-        public async Task<UserSession> GetUserDetail()
+        public async Task<UserSession> GetUserDetails()
         {
             var token = await GetTokenFromLocalStorage();
             if (string.IsNullOrEmpty(token))
@@ -73,6 +74,18 @@ namespace ClothingEcommerceClient.Authentication
                 new AuthenticationHeaderValue("Bearer", 
                 JsonUtils.DeserializeJsonString<TokenProp>(await GetTokenFromLocalStorage()).Token);
             return httpClient;
+        }
+        public async Task RemoveTokenFromLocalStorage() => 
+            await localStorageService.RemoveItemAsync("access_token");
+        public ClaimsPrincipal SetClaimPrincipal(UserSession model)
+        {
+            return new ClaimsPrincipal(new ClaimsIdentity(
+                new List<Claim>
+                {
+                    new(ClaimTypes.Name, model.Name!),
+                    new(ClaimTypes.Email, model.Email!),
+                    new(ClaimTypes.Role, model.Role!),
+                }, "AccesTokenAuth"));
         }
 
         private async Task<string> GetTokenFromLocalStorage() => 

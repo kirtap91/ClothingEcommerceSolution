@@ -3,6 +3,14 @@
         <a class="navbar-brand" href="#"
         <i class="fa fa-cart-shopping text-danger"></i>
             <span class="small text-danger fw-bold">1</span>
+
+            <h6>
+                Hello,
+                <AuthorizeView>
+                    <Authorized> @context.User.Identity!.Name</Authorized>
+                    <NotAuthorized> Guest</NotAuthorized>
+                </AuthorizeView>
+            </h6>
         </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -14,7 +22,7 @@
                     <a class="nav-link active" aria-current="page" href="#">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link d-flex align-items-center" href="#">Products</a>
+                    <a class="nav-link d-flex align-items-center" href="/products">Products</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link d-flex align-items-center" href="#">Services</a>
@@ -26,15 +34,31 @@
                     <a class="nav-link d-flex align-items-center" href="#">Contact</a>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Account
                     </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="#">Action</a>
-                        <a class="dropdown-item" href="#">Another action</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">Something else here</a>
-                    </div>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown" style="font-family:sans-serif">
+                        <AuthorizeView>
+                            <Authorized>
+                                <li>
+                                    <button class="btn btn-danger btn-none"> <i class="fa fa-lock-open"></i>Logout</button>
+                                </li>
+                            </Authorized>
+                            <NotAuthorized>
+                                @{
+                                    string register = "register";
+                                    string login = "login";
+                                }
+                                <li>
+                                    <button class="btn btn-none" @onclick="()=> NavigateTo(login)"> <i class="fa fa-lock"></i>Login</button>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <button class="btn btn-none" @onclick="()=> NavigateTo(register)"> <i class="fa fa-sign-in-alt"></i>Register</button>
+                                </li>
+                            </NotAuthorized>
+                        </AuthorizeView>
+                    </ul>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link disabled" href="#">Disabled</a>
@@ -61,5 +85,10 @@
     {
         ShowSearch = true;
         ShowSearchIcon = !ShowSearch;
+    }
+
+    void NavigateTo(string url)
+    {
+        NavManager.NavigateTo($"identity/account/{url}");
     }
 }
