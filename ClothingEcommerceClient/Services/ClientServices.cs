@@ -14,6 +14,7 @@ namespace ClothingEcommerceClient.Services
         public List<Product> AllProducts { get; set; }
         public List<Product> FeaturedProducts { get; set; }
         public List<Product> ProductsByCategory { get ; set ; }
+        public bool IsVisible { get; set; }
 
 
         //Products
@@ -48,7 +49,9 @@ namespace ClothingEcommerceClient.Services
         {
             if(featuredProducts && FeaturedProducts is null)
             {
+                IsVisible = true;
                 FeaturedProducts = await GetProducts(featuredProducts);
+                IsVisible = false;
                 ProductAction?.Invoke();
                 return;
             }
@@ -56,7 +59,9 @@ namespace ClothingEcommerceClient.Services
             {
                 if (!featuredProducts && AllProducts is null)
                 {
+                    IsVisible = true;
                     AllProducts = await GetProducts(featuredProducts);
+                    IsVisible = false;
                     ProductAction?.Invoke();
                     return;
                 }
@@ -83,6 +88,17 @@ namespace ClothingEcommerceClient.Services
             ProductAction?.Invoke();
 
         }
+
+        public Product GetRandomFeaturedProduct()
+        {
+            if (FeaturedProducts == null || FeaturedProducts.Count == 0)
+                return null!;
+
+            Random randomNumbers = new();
+            int index = randomNumbers.Next(0, FeaturedProducts.Count);
+            return FeaturedProducts[index];
+        }
+
 
 
         //Categories
@@ -142,6 +158,6 @@ namespace ClothingEcommerceClient.Services
         }
         private static async Task<string> ReadContent(HttpResponseMessage response) => await response.Content.ReadAsStringAsync();
 
-      
+        
     }
 }
