@@ -29,12 +29,14 @@ namespace ClothingEcommerceClient.Authentication
         public async Task UpdateAuthenticationState(TokenProp tokenProp)
         {
             ClaimsPrincipal claimsPrincipal = new();
-            if (tokenProp != null || !string.IsNullOrEmpty(tokenProp!.Token))
+            if (tokenProp is not null && !string.IsNullOrEmpty(tokenProp!.Token))
             {
                 await authenticationService.SetTokenToLocalStorage(JsonUtils.SerializeObj(tokenProp));
                 var getUserSession = await authenticationService.GetUserDetails();
-                if (getUserSession != null || !string.IsNullOrEmpty(getUserSession!.Email))
+                if (getUserSession is not null && !string.IsNullOrEmpty(getUserSession!.Email))
+                {
                     claimsPrincipal = authenticationService.SetClaimPrincipal(getUserSession);
+                }                  
             }
             else
             {

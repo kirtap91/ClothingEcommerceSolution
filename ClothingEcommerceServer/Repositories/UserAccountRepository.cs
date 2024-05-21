@@ -35,10 +35,10 @@ namespace ClothingEcommerceServer.Repositories
             if (result is null) return null!;
 
             var getUserInfo = await appDbContext.userAccounts
-                .FirstOrDefaultAsync(_ => _.Id.Equals(result.Id));
+                .FirstOrDefaultAsync(_ => _.Id.Equals(result.UserId));
             if (getUserInfo is null) return null!;
 
-            if (result.ExpiryDate > DateTime.UtcNow) return null!;
+            if (result.ExpiryDate < DateTime.UtcNow) return null!;
 
             var getUserRole = await appDbContext.UserRoles
                 .FirstOrDefaultAsync(_ => _.UserId.Equals(getUserInfo.Id));

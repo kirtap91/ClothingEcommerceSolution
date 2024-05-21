@@ -36,7 +36,7 @@ namespace ClothingEcommerceClient.Authentication
                     RefreshToken = validToken
                 };
 
-                var result = await httpClient.PostAsync("api/account(refresh-token",
+                var result = await httpClient.PostAsync("api/account/refresh-token",
                     JsonUtils.GenerateStringContent(JsonUtils.SerializeObj(model)));
                 if (result.IsSuccessStatusCode && result.StatusCode == System.Net.HttpStatusCode.OK)
                 {

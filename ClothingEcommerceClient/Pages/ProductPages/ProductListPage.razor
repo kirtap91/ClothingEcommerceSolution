@@ -1,8 +1,9 @@
 ﻿@if (AllProducts is not null)
 {
+    var listData = AllProducts.Skip(SkipValue).Take(TakeValue).ToList();
     <div class="container-fluid">
         <div class="row featured__filter">
-            @foreach (var item in AllProducts!.OrderBy(_ => _.Featured))
+            @foreach (var item in listData!.OrderBy(_ => _.Featured))
             {
                 <div class="col-lg-2 col-md-3 col-sm-6 border-success">
                     <div class="featured__item" style="width:200px;">
@@ -19,12 +20,25 @@
                             <h5 class="text-danger">@item.Price.ToString("#.##")</h5>
                         </div>
                     </div>
-                </div>
+                </div>  
             }
+            <div class="d-flex justify-content-center">
+                    <SfPager @ref="@Page" PageSize=18 NumericItemsCount=4 TotalItemsCount=AllProducts.Count ItemClick="Click">
+                    </SfPager>
+                </div
         </div>
     </div>
 }
 
 @code {
+    SfPager? Page;
+    public int SkipValue;
+    public int TakeValue = 18;
     [Parameter] public List<Product> AllProducts { get; set; } = new();
+
+    public void Click(PagerItemClickEventArgs args)
+    {
+        SkipValue = (args.CurrentPage * Page!.PageSize - Page.PageSize);
+        TakeValue = Page.PageSize;
+    }
 }

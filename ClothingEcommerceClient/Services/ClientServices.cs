@@ -1,10 +1,13 @@
-﻿using ClothingEcommerceSharedLibrary.DTOs;
+﻿using Blazored.LocalStorage;
+using ClothingEcommerceClient.Authentication;
+using ClothingEcommerceClient.PrivateModels;
+using ClothingEcommerceSharedLibrary.DTOs;
 using ClothingEcommerceSharedLibrary.Models;
 using ClothingEcommerceSharedLibrary.Responses;
 
 namespace ClothingEcommerceClient.Services
 {
-    public class ClientServices(HttpClient httpClient) : IProductService, ICategoryService, IUserAccountService
+    public class ClientServices(HttpClient httpClient, AuthenticationService authenticationService, ILocalStorageService localStorageService) : IProductService, ICategoryService, IUserAccountService, ICart
     {
         private const string ProductBaseUrl = "api/product";
         private const string CategoryBaseUrl = "api/category";
@@ -17,12 +20,17 @@ namespace ClothingEcommerceClient.Services
         public List<Product> FeaturedProducts { get; set; }
         public List<Product> ProductsByCategory { get ; set ; }
         public bool IsVisible { get; set; }
+        public Action? CartAction { get; set ; }
+        public int CartCount { get ; set ; }
+        public bool IsCartLoaderVisible { get; set; }
 
 
         //Products
         public async Task<ServiceResponse> AddProduct(Product model)
         {
-            var response = await httpClient.PostAsync(ProductBaseUrl, JsonUtils.GenerateStringContent(JsonUtils.SerializeObj(model)));
+            await authenticationService.GetUserDetails();
+            var privateHttpClient = await authenticationService.AddHeaderToHttpClient();
+            var response = await privateHttpClient.PostAsync(ProductBaseUrl, JsonUtils.GenerateStringContent(JsonUtils.SerializeObj(model)));
 
             //Read Response
             var result = CheckResponse(response);
@@ -107,7 +115,9 @@ namespace ClothingEcommerceClient.Services
 
         public async Task<ServiceResponse> AddCategory(Category model)
         {
-            var response = await httpClient.PostAsync(CategoryBaseUrl, JsonUtils.GenerateStringContent(JsonUtils.SerializeObj(model)));
+            await authenticationService.GetUserDetails();
+            var privateHttpClient = await authenticationService.AddHeaderToHttpClient();
+            var response = await privateHttpClient.PostAsync(CategoryBaseUrl, JsonUtils.GenerateStringContent(JsonUtils.SerializeObj(model)));
 
             //Read Response
             var result = CheckResponse(response);
@@ -160,7 +170,7 @@ namespace ClothingEcommerceClient.Services
         }
         private static async Task<string> ReadContent(HttpResponseMessage response) => await response.Content.ReadAsStringAsync();
 
-        //Account/authentication
+        //Account/authentication service
         public async Task<ServiceResponse> Register(UserDTO model)
         {
             var response = await httpClient.PostAsync($"{AuthenticationBaseUrl}/register",
@@ -183,5 +193,107 @@ namespace ClothingEcommerceClient.Services
             var apiResponse = await ReadContent(response);
             return JsonUtils.DeserializeJsonString<LoginResponse>(apiResponse);
         }
+
+
+        // Cart Service
+        public async Task GetCartCount()
+        {
+            string cartString = await GetCartFromLocalStorage();
+            if (string.IsNullOrEmpty(cartString))
+                CartCount = 0;
+            else
+                CartCount = JsonUtils.DeserializeJsonStringList<StorageCart>(cartString).Count;
+
+            CartAction?.Invoke();
+        }
+
+        public async Task<ServiceResponse> AddToCart(Product model, int updateQuantity = 1)
+        {
+            string message = string.Empty;
+            var myCart = new List<StorageCart>();
+            var getCartFromStorage = await GetCartFromLocalStorage();
+            if (!string.IsNullOrEmpty(getCartFromStorage))
+            {
+                myCart = (List<StorageCart>)JsonUtils.DeserializeJsonStringList<StorageCart>(getCartFromStorage);
+                var checkIfAddedAlready = myCart.FirstOrDefault(_ => _.ProductId == model.Id);
+                if (checkIfAddedAlready is null)
+                {
+                    myCart.Add(new StorageCart()
+                    {
+                        ProductId = model.Id,
+                        Quantity = 1
+                    });
+                    message = "Product added to Cart";
+                }
+                else 
+                {
+                    var updateProduct = new StorageCart()
+                    {
+                        ProductId = model.Id,
+                        Quantity = updateQuantity
+                    };
+                    myCart.Remove(checkIfAddedAlready!);
+                    myCart.Add(updateProduct);
+                    message = "Product Updated";
+                }
+            }
+            else
+            {
+                myCart.Add(new StorageCart()
+                {
+                    Quantity = 1,
+                    ProductId = model.Id
+                });
+                message = "Product Added to Cart";
+            }
+            await RemoveCartFromLocalStorage();
+            await SetCartToLocalStorage(JsonUtils.SerializeObj(myCart));
+            await GetCartCount();
+            return new ServiceResponse(true, message);
+        }
+
+        public async Task<List<Order>> MyOrders()
+        {
+            IsCartLoaderVisible = true;
+            var cartList = new List<Order>();
+            string myCartString = await GetCartFromLocalStorage();
+            if (string.IsNullOrEmpty(myCartString)) return null!;
+
+            var myCartList = JsonUtils.DeserializeJsonStringList<StorageCart>(myCartString);
+            await GetAllProducts(false);
+            foreach(var cartItem in myCartList)
+            {
+                var product = AllProducts.FirstOrDefault(_ => _.Id == cartItem.ProductId);
+                cartList.Add(new Order()
+                {
+                    Id = product!.Id,
+                    Name = product.Name,
+                    Quantity = cartItem.Quantity,
+                    Price = product.Price,
+                    Image = product.Base64Img
+                });
+            }
+            IsCartLoaderVisible = false;
+            await GetCartCount();
+            return cartList;
+        }
+
+        public async Task<ServiceResponse> DeleteCart(Order cart)
+        {
+            var myCartList = JsonUtils.DeserializeJsonStringList<StorageCart>(await GetCartFromLocalStorage());
+            if (myCartList is null)
+            {
+                return new ServiceResponse(false, "Product not found");                
+            }
+            myCartList.Remove(myCartList.FirstOrDefault(_ => _.ProductId == cart.Id)!);
+            await RemoveCartFromLocalStorage();
+            await SetCartToLocalStorage(JsonUtils.SerializeObj(myCartList));
+            await GetCartCount();
+            return new ServiceResponse(true, "Product removed successfully");
+        }
+
+        private async Task<string> GetCartFromLocalStorage() => await localStorageService.GetItemAsStringAsync("cart");
+        private async Task SetCartToLocalStorage(string cart) => await localStorageService.SetItemAsStringAsync("cart", cart);
+        private async Task RemoveCartFromLocalStorage() => await localStorageService.RemoveItemAsync("cart");
     }
 }
