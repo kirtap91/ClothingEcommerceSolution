@@ -10,23 +10,25 @@
                         <div class="d-flex justify-content-evenly align-items-center">
 
                             <img src="../resources/left-chevron.png" width="50" height="50" id="styleCursor" @onclick="PreviousButton" />
-                            @if (FeaturedProducts is null) return;
-                            @foreach (var item in FeaturedProducts)
+                            @if (FeaturedProducts != null && FeaturedProducts.Any())
                             {
-                                <div class="card">
-                                    <div class="card-body">
-                                        @if (item.DateUploaded.AddDays(30) < DateTime.Now)
-                                        {
-                                            <span class="badge bg-primary d-flex align-items-end float-end" style="width:50px">New</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-none d-flex align-items-end float-end" style="width:50px; height:20px"></span>
-                                        }
-                                        <img class="card-img-top childImage" src="@item.Base64Img" width="150" height="200" style="max-width:150px;min-width:150px;" />
-                                        <div id="productCover" class="bg-secondary text-white d-flex justify-content-center text-wrap">@item.Name</div>
+                                @foreach (var item in FeaturedProducts)
+                                {
+                                    <div class="card">
+                                        <div class="card-body">
+                                            @if (item.DateUploaded.AddDays(30) < DateTime.Now)
+                                            {
+                                                <span class="badge bg-primary d-flex align-items-end float-end" style="width:50px">New</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-none d-flex align-items-end float-end" style="width:50px; height:20px"></span>
+                                            }
+                                            <img class="card-img-top childImage" src="@item.Base64Img" width="150" height="200" style="max-width:150px;min-width:150px;" />
+                                            <div id="productCover" class="bg-secondary text-white d-flex justify-content-center text-wrap">@item.Name</div>
+                                        </div>
                                     </div>
-                                </div>
+                                }
                             }
                             <img src="../resources/right-chevron.png" width="50" height="50" id="styleCursor" @onclick="NextButton" />
                         </div>
@@ -64,6 +66,10 @@
     .childImage:hover {
         opacity: 0.5;
     }
+
+    .bg-none {
+        background-color: transparent;
+    }
 </style>
 
 @code {
@@ -78,28 +84,26 @@
         bool featured = true;
         await ProductService.GetAllProducts(featured);
         ProductService.ProductAction += StateHasChanged;
-        LoadData();
+        await LoadData();
     }
 
-    private async void LoadData()
+    private async Task LoadData()
     {
         var getData = await SkipAndTake(Skip, Take);
         Skip += PageSize;
         AddToFeaturedProducts(getData);
     }
 
-    private async Task<List<Product>> SkipAndTake(int skip, int take) => ProductService.FeaturedProducts
-        .Skip(Skip)
-        .Take(Take)
-        .ToList();
+    private async Task<List<Product>> SkipAndTake(int skip, int take) =>
+        ProductService.FeaturedProducts.Skip(skip).Take(take).ToList();
 
     private void AddToFeaturedProducts(List<Product> incomingProduct)
     {
-        FeaturedProducts?.Clear();
-        FeaturedProducts = incomingProduct;
+        FeaturedProducts.Clear();
+        FeaturedProducts.AddRange(incomingProduct);
     }
 
-    private async void NextButton()
+    private async Task NextButton()
     {
         if (Skip > ProductService.FeaturedProducts.Count()) return;
         var getNextProducts = await SkipAndTake(Skip, Take);
@@ -107,11 +111,12 @@
         AddToFeaturedProducts(getNextProducts);
     }
 
-    private async void PreviousButton()
+    private async Task PreviousButton()
     {
-        if (Skip == 8) return;
-        var getPreviousProducts = await SkipAndTake(Skip - (PageSize * 2), Take);
-        Skip -= PageSize;
+        if (Skip <= PageSize) return;
+        Skip -= PageSize * 2;
+        var getPreviousProducts = await SkipAndTake(Skip, Take);
+        Skip += PageSize;
         AddToFeaturedProducts(getPreviousProducts);
     }
     public void Dispose()

@@ -1,4 +1,6 @@
-﻿@if (AllProducts is not null)
+﻿@implements IDisposable
+
+@if (AllProducts is not null)
 {
     var listData = AllProducts.Skip(SkipValue).Take(TakeValue).ToList();
     <div class="container-fluid">
@@ -12,12 +14,12 @@
                             <ul class="featured__item__pic__hover">
                                 <li><a href="#"><i class="fa fa-heart"></i></a></li>
                                 <li><a href="#"><i class="fa fa-retweet"></i></a></li>
-                                <li><a href="#"><i class="fa fa-shopping-cart text-danger"></i></a></li>
+                                <li><a @onclick="()=> AddToCart(item)" style="cursor:pointer"><i class="fa fa-shopping-cart text-danger"></i></a></li>
                             </ul>
                         </div>
                         <div class="featured__item__text">
                             <h6 class="text-primary">@item.Name</h6>
-                            <h5 class="text-danger">@item.Price.ToString("#.##")</h5>
+                            <h5 class="text-danger">@item.Price.ToString("#.##:-")</h5>
                         </div>
                     </div>
                 </div>  
@@ -30,15 +32,38 @@
     </div>
 }
 
+<MessageDialog @ref="messageDialogService.messageDialog"></MessageDialog>
+
 @code {
     SfPager? Page;
     public int SkipValue;
     public int TakeValue = 18;
     [Parameter] public List<Product> AllProducts { get; set; } = new();
 
+    protected override void OnInitialized()
+    {
+        messageDialogService.Action += StateHasChanged;
+    }
+
     public void Click(PagerItemClickEventArgs args)
     {
         SkipValue = (args.CurrentPage * Page!.PageSize - Page.PageSize);
         TakeValue = Page.PageSize;
     }
+
+    private async Task AddToCart(Product model)
+    {
+        var (isSuccessful, message) = await cartService.AddToCart(model);
+        if (isSuccessful)
+            messageDialogService.messageDialog!.SetDialogValues("success", message);
+        else
+            messageDialogService.messageDialog!.SetDialogValues("info", message);
+        messageDialogService.SetMessageDialog();
+    }
+
+    public void Dispose()
+    {
+        messageDialogService.Action -= StateHasChanged;
+    }
+
 }

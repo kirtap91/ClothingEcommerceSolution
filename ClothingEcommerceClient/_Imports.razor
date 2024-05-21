@@ -13,12 +13,15 @@
 @using ClothingEcommerceSharedLibrary.Models
 @using ClothingEcommerceSharedLibrary.DTOs
 @using ClothingEcommerceClient.Authentication
+@using ClothingEcommerceClient.PrivateModels
+@using ClothingEcommerceSharedLibrary.Responses
 
 @using Syncfusion.Blazor.Navigations
 @using ClothingEcommerceClient.Pages.OtherPages
 @using ClothingEcommerceClient.Pages.ProductPages
 @using ClothingEcommerceClient.Pages.CategoryPages
 
+@inject ICart cartService
 @inject IJSRuntime js
 @inject IProductService ProductService
 @inject ICategoryService CategoryService
