@@ -88,8 +88,10 @@ namespace ClothingEcommerceClient.Authentication
                 }, "AccesTokenAuth"));
         }
 
-        private async Task<string> GetTokenFromLocalStorage() => 
-            await localStorageService.GetItemAsStringAsync("access_token");
+        private async Task<string> GetTokenFromLocalStorage()
+        {
+            return await localStorageService.GetItemAsStringAsync("access_token") ?? string.Empty;
+        }
 
         private async Task<HttpResponseMessage> GetUserDetailsFromApi()
         {

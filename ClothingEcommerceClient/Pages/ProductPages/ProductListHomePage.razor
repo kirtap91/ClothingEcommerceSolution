@@ -16,7 +16,14 @@ else
                 <BannerPage />
                 <div class="card border-0">
                     <div class="card-header border-success-subtle mb-2"></div>
-                    <ProductListPage AllProducts="ProductService.ProductsByCategory??ProductService.AllProducts" />
+                    @if (ShowProductList)
+                    {
+                        <ProductListPage AllProducts="ProductService.ProductsByCategory??ProductService.AllProducts" HandleProductDetailsEvent="HandleProductDetailsEvent" />
+                    }
+                    @if (ShowProductDetails)
+                    {
+                        <ProductDetails HandleBackClickedEvent="HandleBackClickedEvent" Product="ProductDetails" />
+                    }
                 </div>
             </div>
         </div>
@@ -24,6 +31,9 @@ else
 }
 
 @code {
+    public bool ShowProductList { get; set; } = true;
+    public bool ShowProductDetails { get; set; } = false;
+    public Product ProductDetails { get; set; } = new();
 
     protected async override Task OnInitializedAsync()
     {
@@ -42,6 +52,19 @@ else
     {
         ProductService.ProductsByCategory = null!;
         await LoadData();
+    }
+
+    void HandleBackClickedEvent()
+    {
+        ShowProductList = true;
+        ShowProductDetails = false;
+    }
+
+    void HandleProductDetailsEvent(Product viewProduct)
+    {
+        ProductDetails = viewProduct;
+        ShowProductDetails = true;
+        ShowProductList = false;
     }
 
     async Task LoadData()

@@ -81,11 +81,9 @@ namespace ClothingEcommerceClient.Services
         private async Task<List<Product>> GetProducts(bool featured)
         {
             var response = await httpClient.GetAsync($"{ProductBaseUrl}?featured={featured}");
-            var isSuccessful = CheckResponse(response);
-            if (!isSuccessful.IsSuccessful)
-            {
-                return null!;
-            }
+            var (isSuccessful, _) = CheckResponse(response);
+            if (!isSuccessful) return null!;
+            
             var result = await ReadContent(response);
             return (List<Product>?)JsonUtils.DeserializeJsonStringList<Product>(result)!;
         }
