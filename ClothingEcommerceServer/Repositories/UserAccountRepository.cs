@@ -4,7 +4,6 @@ using ClothingEcommerceSharedLibrary.DTOs;
 using ClothingEcommerceSharedLibrary.Responses;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client;
 using System.Security.Cryptography;
 using System.Text;
 

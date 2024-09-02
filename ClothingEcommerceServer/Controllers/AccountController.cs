@@ -1,7 +1,6 @@
 ﻿using ClothingEcommerceServer.Repositories;
 using ClothingEcommerceSharedLibrary.DTOs;
 using ClothingEcommerceSharedLibrary.Responses;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClothingEcommerceServer.Controllers

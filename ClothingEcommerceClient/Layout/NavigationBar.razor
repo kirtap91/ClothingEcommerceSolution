@@ -3,11 +3,10 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
         <a class="navbar-brand" @onclick="GotoCartPage" style="cursor:pointer">
-
             <i class="fa fa-cart-shopping text-danger"></i>
             <span class="small text-danger fw-bold">@cartService.CartCount</span>
 
-            <h6>
+            <h6 class="d-inline">
                 Hello,
                 <AuthorizeView>
                     <Authorized> @context.User.Identity!.Name</Authorized>
@@ -15,12 +14,12 @@
                 </AuthorizeView>
             </h6>
         </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 
-        <div class="collapse navbar-collapse fw-bold" id="navbarSupportedContent" style="margin-left:25vw">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0" style="font-family:MyFont">
+        <div class="collapse navbar-collapse fw-bold" id="navbarSupportedContent">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0" style="font-family:MyFont">
                 <li class="nav-item">
                     <a class="nav-link active" aria-current="page" style="margin-right:20px" href="/">Home</a>
                 </li>
@@ -71,6 +70,7 @@
         </div>
     </div>
 </nav>
+
 
 @code {
     public bool ShowSearch { get; set; }
