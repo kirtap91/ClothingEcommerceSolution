@@ -1,0 +1,27 @@
+﻿.searchbar {
+    position: fixed;
+    top: 90px; /* Adjust based on initial height of TopList + Navbar */
+    width: 100%;
+    z-index: 998; /* Ensure it's below the navbar */
+    background-color: white;
+    padding: 0;
+    margin: 0;
+    justify-content: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: top 0.3s ease-in-out, opacity 0.3s ease-in-out; /* Smooth transition for top and opacity */
+}
+.searchbar-hidden {
+    transform: translateY(-100%);
+    opacity: 0;
+}
+@media (max-width: 768px) {
+    .toplist-text {
+        font-size: 0.875rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .toplist-text {
+        font-size: 0.75rem;
+    }
+}

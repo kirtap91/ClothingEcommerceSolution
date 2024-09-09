@@ -1,0 +1,10 @@
+﻿.control-container {
+    max-width: 100%; /* Ensures the carousel doesn't exceed screen width */
+    overflow: hidden;
+}
+
+@media (max-width: 768px) {
+    .control-container {
+        padding: 0 10px; /* Add padding to prevent content from touching the screen edges */
+    }
+}

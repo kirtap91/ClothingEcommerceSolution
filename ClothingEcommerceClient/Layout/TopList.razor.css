@@ -8,6 +8,7 @@
     align-items: center;
     background-color: #082939;
     color: #F7F6F4;
+    height: 25px;
     transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
 }
 

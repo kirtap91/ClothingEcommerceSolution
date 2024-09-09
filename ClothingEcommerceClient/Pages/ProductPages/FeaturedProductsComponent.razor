@@ -2,35 +2,42 @@
 {
     <div class="container-fluid mt-5">
         <div class="row">
-            <div class="col-md-12 col-sm-12">
+            <div class="col-12">
                 <hr />
-                <span style="font-family:'Times New Roman', Times, serif">Featured</span>
+                <span class="h4 d-block text-center" style="font-family:'Times New Roman', Times, serif">Featured</span>
                 <div class="card border-0">
                     <div class="card-body">
-                        <div class="d-flex justify-content-evenly align-items-center">
+                        <div class="d-flex justify-content-center align-items-center">
+                            <img src="../resources/left-chevron.png" class="img-fluid" width="50" height="50" id="styleCursor" @onclick="PreviousButton" />
 
-                            <img src="../resources/left-chevron.png" width="50" height="50" id="styleCursor" @onclick="PreviousButton" />
-                            @if (FeaturedProducts != null && FeaturedProducts.Any())
-                            {
-                                @foreach (var item in FeaturedProducts)
+                            <div class="row gx-2">
+                                @if (FeaturedProducts != null && FeaturedProducts.Any())
                                 {
-                                    <div class="card">
-                                        <div class="card-body">
-                                            @if (item.DateUploaded.AddDays(30) < DateTime.Now)
-                                            {
-                                                <span class="badge bg-primary d-flex align-items-end float-end" style="width:50px">New</span>
-                                            }
-                                            else
-                                            {
-                                                <span class="badge bg-none d-flex align-items-end float-end" style="width:50px; height:20px"></span>
-                                            }
-                                            <img class="card-img-top childImage" src="@item.Base64Img" width="150" height="200" style="max-width:150px;min-width:150px;" />
-                                            <div id="productCover" class="bg-secondary text-white d-flex justify-content-center text-wrap">@item.Name</div>
+                                    @foreach (var item in FeaturedProducts)
+                                    {
+                                        <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+                                            <div class="card h-100">
+                                                <div class="card-body text-center">
+                                                    @if (item.DateUploaded.AddDays(30) < DateTime.Now)
+                                                    {
+                                                        <span class="badge bg-primary float-end">New</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge bg-none float-end"></span>
+                                                    }
+
+                                                    <img class="card-img-top img-fluid childImage" src="@item.Base64Img" alt="@item.Name" />
+
+                                                    <div id="productCover" class="bg-secondary text-white mt-2">@item.Name</div>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
+                                    }
                                 }
-                            }
-                            <img src="../resources/right-chevron.png" width="50" height="50" id="styleCursor" @onclick="NextButton" />
+                            </div>
+
+                            <img src="../resources/right-chevron.png" class="img-fluid" width="50" height="50" id="styleCursor" @onclick="NextButton" />
                         </div>
                     </div>
                 </div>
@@ -38,16 +45,16 @@
         </div>
     </div>
 }
+
 <style>
     #styleCursor {
-        cursor: pointer
+        cursor: pointer;
     }
 
     #productCover {
-        width: 150px;
-        font-size: 14px;
+        font-size: 1rem;
         height: 50px;
-        position: absolute;
+        position: relative;
         bottom: 10px;
         border-radius: 10px;
         padding: 2px;
@@ -55,7 +62,7 @@
     }
 
         #productCover:hover {
-            opacity: 1
+            opacity: 1;
         }
 
     img {
@@ -69,6 +76,10 @@
 
     .bg-none {
         background-color: transparent;
+    }
+
+    .card {
+        border: none;
     }
 </style>
 
@@ -119,9 +130,9 @@
         Skip += PageSize;
         AddToFeaturedProducts(getPreviousProducts);
     }
+
     public void Dispose()
     {
         ProductService.ProductAction -= StateHasChanged;
     }
-
 }

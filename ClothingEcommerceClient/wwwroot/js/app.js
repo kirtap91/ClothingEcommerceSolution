@@ -1,12 +1,5 @@
-﻿<div class="toplist text-center">
-    <p class="mb-0 toplist-text">✔ Free shipping over 399 sek ✔ Free returns ✔ 1-3 day delivery</p>
-</div>
-
-@code {
-    // Custom code-behind logic, if needed
-}
-
-@* <script>
+﻿(function () {
+    // Function to handle scrolling behavior
     window.onscroll = function () {
         var toplist = document.querySelector('.toplist');
         var searchbar = document.querySelector('.searchbar');
@@ -14,13 +7,17 @@
 
         // Define scroll thresholds
         var toplistHideThreshold = 50;  // Hide TopList after 50px
-        var searchbarHideThreshold = 350; // Hide SearchBar after 150px
+        var searchbarHideThreshold = 350; // Hide SearchBar after 350px
 
         // Hide the toplist when scrolled more than toplistHideThreshold
         if (document.body.scrollTop > toplistHideThreshold || document.documentElement.scrollTop > toplistHideThreshold) {
             toplist.classList.add('toplist-hidden');
+            navbar.style.top = '0'; // Move the navbar to the top
+            searchbar.style.top = navbar.offsetHeight + 'px'; // Move the searchbar up below the navbar
         } else {
             toplist.classList.remove('toplist-hidden');
+            navbar.style.top = '25px'; // Move navbar below TopList
+            searchbar.style.top = (25 + navbar.offsetHeight) + 'px'; // Adjust SearchComponent position accordingly
         }
 
         // Hide the searchbar when scrolled more than searchbarHideThreshold
@@ -33,11 +30,11 @@
         // Make the navbar fixed after scrolling past the toplist and searchbar
         var scrollPosition = document.body.scrollTop || document.documentElement.scrollTop;
         if (scrollPosition > toplist.offsetHeight + searchbar.offsetHeight) {
-            navbar.classList.add('navbar-fixed');
+            navbar.classList.add('navbar-fixed'); // Apply fixed styling to the navbar
         } else {
-            navbar.classList.remove('navbar-fixed');
+            navbar.classList.remove('navbar-fixed'); // Revert to original state
         }
     };
-</script> *@
+})();
 
 

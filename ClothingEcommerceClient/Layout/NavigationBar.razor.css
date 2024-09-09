@@ -1,0 +1,25 @@
+﻿.navbar {
+    position: fixed;
+    top: 25px; /* Initial position below the TopList */
+    width: 100%;
+    z-index: 998; /* Below the TopList but above other content */
+    background-color: #fff;
+    transition: top 0.3s ease-in-out; /* Smooth transition when moving the navbar */
+}
+
+/* Ensure the navbar becomes fixed at the top of the viewport */
+.navbar-fixed {
+    position: fixed;
+    top: 0; /* Ensure it's pinned to the top of the viewport */
+    width: 100%; /* Ensure it takes up the full width */
+    z-index: 999; /* Ensure it stays above other content */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Optional shadow for fixed navbar */
+    background-color: #fff; /* Optional: Set background to avoid transparency */
+    transition: top 0.3s ease-in-out; /* Smooth transition */
+}
+
+
+.content {
+    padding-top: 130px;
+}
+
