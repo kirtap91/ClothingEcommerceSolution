@@ -21,7 +21,7 @@ else
                         </span>
                     </div>
                     <div class="card-footer">
-                        <button class="btn btn-lg btn-danger">
+                        <button class="btn btn-lg btn-danger" @onclick="Checkout">
                             <i class="fa fa-cart-arrow-down"></i>
                             Proceed to Checkout
                         </button>
@@ -139,6 +139,17 @@ else
     {
         SkipValue = (args.CurrentPage * Page!.PageSize) - Page.PageSize;
         TakeValue = Page.PageSize;
+    }
+
+    async Task Checkout(){
+        if (MyCartOrders is null)
+        
+            DisplayResponse(new ServiceResponse(false, "Cart is empty"));
+        
+        
+        var url = await cartService.Checkout(MyCartOrders!);
+        NavManager.NavigateTo(url);
+
     }
 
     public void Dispose()

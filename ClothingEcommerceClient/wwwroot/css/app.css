@@ -228,3 +228,46 @@ code {
         -webkit-transform: scaleY(1.0);
     }
 }
+
+/* TopList styles */
+/*.toplist {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: #fff;
+    z-index: 1000;*/ /* Ensure it is above other content */
+/*}
+
+.toplist-hidden {
+    display: none;
+}*/
+
+/* Navbar styles */
+/*.navbar {
+    position: fixed;
+    top: 25px;*/ /* Adjust based on the height of the toplist */
+    /*width: 100%;
+    z-index: 999;*/ /* Ensure it is above other content but below toplist */
+/*}
+
+.navbar-fixed {
+    position: fixed;
+    top: 0;
+}*/
+
+/* Searchbar styles */
+/*.searchbar {
+    position: fixed;
+    top: 100px;*/ /* Adjust based on the height of the toplist and navbar */
+    /*width: 100%;
+    z-index: 998;*/ /* Ensure it is above other content but below navbar */
+/*}
+
+.searchbar-hidden {
+    display: none;
+}*/
+
+/*Additional styles for other elements */
+/*.container-fluid {
+    padding-top: 120px;  Adjust based on the height of fixed elements 
+}*/

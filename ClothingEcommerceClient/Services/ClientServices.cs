@@ -289,9 +289,18 @@ namespace ClothingEcommerceClient.Services
             await GetCartCount();
             return new ServiceResponse(true, "Product removed successfully");
         }
+        public async Task<string> Checkout(List<Order> cartItems)
+        {
+            var response = await httpClient.PostAsync("api/payment/checkout",
+                JsonUtils.GenerateStringContent(JsonUtils.SerializeObj(cartItems)));
+            var url = await response.Content.ReadAsStringAsync();
+            return url;
+        }
 
         private async Task<string> GetCartFromLocalStorage() => await localStorageService.GetItemAsStringAsync("cart");
         private async Task SetCartToLocalStorage(string cart) => await localStorageService.SetItemAsStringAsync("cart", cart);
         private async Task RemoveCartFromLocalStorage() => await localStorageService.RemoveItemAsync("cart");
+
+      
     }
 }
