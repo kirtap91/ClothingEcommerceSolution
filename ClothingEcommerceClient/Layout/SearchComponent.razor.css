@@ -1,0 +1,92 @@
+﻿/*.searchbar {
+    position: fixed;
+    top: 90px;*/ /* Adjust based on initial height of TopList + Navbar */
+    /*width: 100%;
+    z-index: 998;*/ /* Ensure it's below the navbar */
+    /*background-color: white;
+    padding: 0;
+    margin: 0;
+    justify-content: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: top 0.3s ease-in-out, opacity 0.3s ease-in-out;*/ /* Smooth transition for top and opacity */
+/*}
+.searchbar-hidden {
+    transform: translateY(-100%);
+    opacity: 0;
+}
+.searchbar .position-relative {
+    display: inline-block;
+    width: 100%;
+}
+
+.searchbar input {
+    padding-left: 40px;*/ /* Space for the icon inside the input */
+/*}
+
+.search-icon {
+    position: absolute;
+    top: 50%;
+    left: 10px;*/ /* Adjust this to control how far the icon is from the left edge */
+    /*transform: translateY(-50%);*/ /* This ensures vertical centering */
+    /*font-size: 1rem;*/ /* Adjust the size of the icon */
+    /*color: #aaa;*/ /* Optional: Change the color of the icon */
+/*}
+
+ 
+@media (max-width: 768px) {
+    .toplist-text {
+        font-size: 0.875rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .toplist-text {
+        font-size: 0.75rem;
+    }
+}*/
+/* Main search bar styling */
+.searchbar {
+    position: fixed;
+    top: 90px; /* Adjust based on initial height of TopList + Navbar */
+    width: 100%;
+    z-index: 998; /* Ensure it's below the navbar */
+    background-color: white;
+    padding: 0;
+    margin: 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: top 0.3s ease-in-out, opacity 0.3s ease-in-out; /* Smooth transition for top and opacity */
+}
+
+/* Hidden state for when searchbar is scrolled out of view */
+.searchbar-hidden {
+    transform: translateY(-100%);
+    opacity: 0;
+}
+
+/* Ensure the input is properly aligned inside the searchbar */
+.searchbar input {
+    padding-left: 40px; /* Space for the search icon */
+}
+
+/* Positioning for the search icon */
+.search-icon {
+    position: absolute;
+    top: 50%;
+    left: 10px; /* Distance from the left side of the input */
+    transform: translateY(-50%); /* Vertically center the icon */
+    font-size: 1rem; /* Adjust the size of the icon */
+    color: #aaa; /* Optional: Change the color of the icon */
+}
+
+/* Media queries for responsiveness */
+@media (max-width: 768px) {
+    .toplist-text {
+        font-size: 0.875rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .toplist-text {
+        font-size: 0.75rem;
+    }
+}

@@ -1,19 +1,14 @@
 ﻿using ClothingEcommerceServer.Data;
-using ClothingEcommerceSharedLibrary.Contracts;
 using ClothingEcommerceSharedLibrary.Models;
 using ClothingEcommerceSharedLibrary.Responses;
 using Microsoft.EntityFrameworkCore;
 
 namespace ClothingEcommerceServer.Repositories
 {
-    public class ProductRepository : IProduct
+    public class ProductRepository(AppDbContext appDbContext) : IProduct
     {
-        private readonly AppDbContext appDbContext;
+        private readonly AppDbContext appDbContext = appDbContext;
 
-        public ProductRepository(AppDbContext appDbContext)
-        {
-            this.appDbContext = appDbContext;
-        }
         public async Task<ServiceResponse> AddProduct(Product model)
         {
             if (model == null) return new ServiceResponse(false, "Model is null");
@@ -27,9 +22,17 @@ namespace ClothingEcommerceServer.Repositories
             return new ServiceResponse(flag, message);
         }
 
+        public async Task<List<Product>> GetAllProducts(bool featuredProducts)
+        {
+            if (featuredProducts)
+                return await appDbContext.Products.Where(_=>_.Featured).ToListAsync();
+            else 
+                return await appDbContext.Products.ToListAsync(); 
+        }
+
         private async Task<ServiceResponse> CheckName(string name)
         {
-            var product = await appDbContext.Products.FirstOrDefaultAsync(x => x.Name.ToLower()!.Equals(name.ToLower()));
+            var product = await appDbContext.Products.FirstOrDefaultAsync(x => x.Name!.ToLower()!.Equals(name.ToLower()));
             return product is null ? new ServiceResponse(true, null!) : new ServiceResponse(false, "Product already exist");
         }
 

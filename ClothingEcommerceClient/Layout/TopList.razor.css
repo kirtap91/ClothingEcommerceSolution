@@ -1,0 +1,36 @@
+﻿.toplist {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #082939;
+    color: #F7F6F4;
+    height: 25px;
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+}
+
+.toplist-hidden {
+    transform: translateY(-100%);
+    opacity: 0;
+}
+
+.toplist-text {
+    font-size: 1rem;
+    white-space: nowrap;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .toplist-text {
+        font-size: 0.875rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .toplist-text {
+        font-size: 0.75rem;
+    }
+}
